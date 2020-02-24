@@ -1,0 +1,66 @@
+---
+title: "Lab 3 and 4"
+output: html_notebook
+---
+
+```{r}
+x <- seq(from = 0, to = 8, by = 0.1)
+curve(dexp(x, rate = 2), to = 8, xlab = 'Time Between Questions', ylab = 'Probability')
+z = dexp(x, rate = 2)
+a = pexp(1, rate = 2)
+b = pexp(2, rate = 2)
+f = qexp(seq(from = 0, to = 1, by = 0.25),2)
+
+c = b - a
+d = 1 - b
+
+y <- rexp(n = 5, rate = 2)
+hist(y, prob=T, xlab = "Time between Questions", ylab= "Probability", main = "Simulation of Time between Questions")
+curve(dexp(x, rate = 2), from = 0, to =8, add=T )
+```
+
+```{r}
+n <- 10000
+Xa <- rexp(n, rate = 1/50)
+Xb <- rexp(n, rate = 1/50)
+Xc <- rexp(n, rate = 1/50)
+
+X <- cbind(Xa, Xb, Xc)
+head(X)
+
+Y1 <- apply(X, 1, max)
+
+hist(Y1, prob=T, breaks = 40)
+
+f1 <- function(y){
+  3/50 * (1-exp(-y/50))^2 * exp(-y/50)
+}
+curve(f1, from = 0, to = 350, add=T)
+blah = sum(Y1 < 40)/n
+
+check = (1-exp(-4/5))^3
+
+```
+
+```{r}
+n <- 10000
+Xa <- rexp(n, rate = 1/50)
+Xb <- rexp(n, rate = 1/50)
+Xc <- rexp(n, rate = 1/50)
+
+X2 <- cbind(Xa, Xb, Xc)
+head(X2)
+
+Y2 <- apply(X2, 1, min)
+
+hist(Y2, prob=T, breaks = 40)
+
+f2 <- function(y){
+  (-exp(-y/50))^2 * exp(-y/50)* 3/50
+}
+curve(f2, from = 0, to = 350, add=T)
+blah2 = sum(Y2 < 40)/n
+
+check2 = 1-(exp(-4/5))^3
+```
+

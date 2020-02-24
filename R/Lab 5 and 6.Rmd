@@ -1,0 +1,94 @@
+---
+title: "Lab 5"
+output: html_notebook
+---
+
+
+```{r}
+f <- runif(500, 5, 15)
+f2 <- dunif(500, 5, 15)
+hist(f, prob=TRUE, breaks=20)
+curve(dunif(x, 5, 15), from = 5, to = 15, add = TRUE)
+
+```
+```{r}
+n <- 5
+N <- 1000
+
+M <- matrix(data=runif(N*n, 5, 15), nrow = N, ncol= n)
+mbar <- apply(M, MARGIN = 1, FUN = mean)
+hist(mbar, prob=TRUE, breaks = 20)
+plot(density(mbar))
+```
+
+```{r}
+n2 <- 50
+N2 <- 1000
+
+M2 <- matrix(data=runif(N2*n2, 5, 15), nrow = N2, ncol= n2)
+mbar2 <- apply(M2, MARGIN = 1, FUN = mean)
+hist(mbar2, prob=TRUE, breaks = 20)
+plot(density(mbar2))
+```
+
+```{r}
+summary(mbar)
+var(mbar)
+summary(mbar2)
+var(mbar2)
+```
+
+```{r}
+plot(density(mbar), ylim=c(0,1))
+lines(density(mbar2), col="blue")
+```
+```{r}
+n3 <- 10
+N3 <- 10000
+
+mu <- 15
+sigma <- 2 
+
+samples <- matrix(NA, nrow = N3, ncol=n3)
+
+sample.variances <- rep(NA, N3)
+sample.variances2 <- rep(NA, N3)
+sample.variances3 <- rep(NA, N3)
+
+
+for(i in 1:N3 ){
+  samples[i,] <- rnorm(n3, mean = mu, sd = sigma)
+  deviation <- samples[i,] - mean(samples[i,])
+  sample.variances[i] <- (1/(n3)) * sum((deviation)^2)
+  sample.variances2[i] <- (1/(n3-1)) * sum((deviation)^2)
+  sample.variances3[i] <- (1/(n3-2)) * sum((deviation)^2)
+}
+
+summary(sample.variances)
+summary(sample.variances2)
+summary(sample.variances3)
+
+sd(sample.variances)
+sd(sample.variances2)
+sd(sample.variances3)
+
+hist(sample.variances)
+hist(sample.variances2)
+hist(sample.variances3)
+
+boxplot(sample.variances,sample.variances2, sample.variances3, xlab = "Estimators", ylab="Sample Variance", ylim = c(0,6), col=c("darkgoldenrod1", "cyan3", "coral2"))
+abline(h=4)
+
+
+
+plot(density(sample.variances), col="darkgoldenrod1")
+lines(density(sample.variances2),  col="cyan3")
+lines(density(sample.variances3), col="coral2")
+
+
+
+Residuals = c(median(sample.variances), median(sample.variances2), median(sample.variances3)) - 4
+min(abs(Residuals))
+
+```
+

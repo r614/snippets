@@ -1,0 +1,131 @@
+---
+title: "Lab 7 and 8"
+output: html_notebook
+---
+```{r}
+a = 2
+b = 6
+N <- 10000
+n <- 18 #Sample Size
+m <- (a+b)/2 # Mean
+s <- sqrt(((b-a)**2) /12)
+alpha <- 0.05
+
+un <- nw <- matrix(NA, nrow=N, ncol=2)
+evaluate <- evaluate.true <- rep(FALSE, N)
+in.CI <- function(x){
+  (x[1] <= m & m <=x[2])
+}
+
+for(i in 1:N){
+  Sample <- rnorm(n,m,s) 
+  un[i,] <- c(mean(Sample) - (-1)*qt(alpha/2,df = n-1)*sd(Sample)/sqrt(n),mean(Sample) + (-1)*qt(alpha/2, df = n - 1)*sd(Sample)/sqrt(n))
+  # Calculate the i-th confidence interval for estimated SD
+
+  nw[i,] <- c(mean(Sample)-(-1)*qnorm(alpha/2, 0,1)*s/sqrt(n),mean(Sample) + (-1)*qnorm(alpha/2, 0,1)*s/sqrt(n))
+# Calculate the i-th confidence interval for known SD
+  
+  evaluate[i] <- in.CI(un[i,])
+  #m is contained in the 1st CI when SD unknown?
+  evaluate.true[i] <- in.CI(nw[i,])
+  #m is contained in the 2nd CI when SD is known?
+  
+  #cat(i, ":Intevals (", round(un[i,], 2), ")",c("*", "")[as.numeric(evaluate[i]) + 1],"and (", round(nw[i,],2),")",c("*","")[as.numeric(evaluate.true[i])+1], "\n")
+  # print the results for i-th CIs)
+}
+
+sum(evaluate == FALSE)/N
+sum(evaluate.true == FALSE)/N
+```
+
+```{r}
+print(length(evaluate.true[evaluate.true==TRUE]))
+print(length(evaluate[evaluate==TRUE]))
+
+sum(evaluate == TRUE)/N
+sum(evaluate.true == TRUE)/N
+
+```
+
+```{r}
+a = 2
+b = 6
+N <- 10000
+n <- 100 #Sample Size
+m <- (a+b)/2 # Mean
+s <- sqrt(((b-a)**2) /12)
+alpha <- 0.05
+
+un2 <- nw2 <- matrix(NA, nrow=N, ncol=2)
+evaluate2 <- evaluate.true2 <- rep(FALSE, N)
+in.CI <- function(x){
+  (x[1] <= m & m <=x[2])
+}
+
+for(i in 1:N){
+  Sample <- rnorm(n,m,s) 
+  un2[i,] <- c(mean(Sample) - (-1)*qt(alpha/2,df = n-1)*sd(Sample)/sqrt(n),mean(Sample) + (-1)*qt(alpha/2, df = n - 1)*sd(Sample)/sqrt(n))
+  # Calculate the i-th confidence interval for estimated SD
+
+  nw2[i,] <- c(mean(Sample)-(-1)*qnorm(alpha/2, 0,1)*s/sqrt(n),mean(Sample) + (-1)*qnorm(alpha/2, 0,1)*s/sqrt(n))
+# Calculate the i-th confidence interval for known SD
+  
+  evaluate2[i] <- in.CI(un2[i,])
+  #m is contained in the 1st CI when SD unknown?
+  evaluate.true2[i] <- in.CI(nw2[i,])
+  #m is contained in the 2nd CI when SD is known?
+  
+  #cat(i, ":Intevals (", round(un[i,], 2), ")",c("*", "")[as.numeric(evaluate[i]) + 1],"and (", round(nw[i,],2),")",c("*","")[as.numeric(evaluate.true[i])+1], "\n")
+  # print the results for i-th CIs)
+}
+
+sum(evaluate2 == FALSE)/N
+sum(evaluate.true2 == FALSE)/N
+```
+
+```{r}
+print(length(evaluate.true2[evaluate.true2==TRUE]))
+print(length(evaluate2[evaluate2==TRUE]))
+
+sum(evaluate2 == TRUE)/N
+sum(evaluate.true2 == TRUE)/N
+```
+
+```{r}
+hotdog = read.table("Z:/Desktop/HotdogData.txt", head = T)
+
+attach(hotdog) # attach data file so that you can call them by vector names
+#names(hockey) # see the column vector names hockey   # print the raw data (examine briefly)
+
+boxplot(Sodium ~ Type, xlab = "Type", ylab ="Sodium", main = "Sodium and Type") #Examine/compare 
+
+model = lm(Sodium ~ Type) 
+# fit linear model 
+fit = aov(model) # ANOVA 
+summary(fit) # summary ANOVA table 
+
+u1 = mean(Sodium[which(Type == "Beef")]) 
+u2 = mean(Sodium[which(Type == "Meat")]) 
+u3 = mean(Sodium[which(Type == "Poultry")])
+
+n1 = length(which(Type == "Beef")) 
+n2 = length(which(Type == "Meat")) 
+n3 = length(which(Type == "Poultry")) 
+
+mse <- sum(fit$residuals^2)/fit$df.residual #MSE 
+se12 <- sqrt(mse)*sqrt((n1+n1)/(n1*n2)) #SE for can & oil 
+se13 <- sqrt(mse)*sqrt((n1+n3)/(n1*n3)) #SE for can & fla 
+se23 <- sqrt(mse)*sqrt((n2+n3)/(n2*n3)) #SE for oil & fla 
+
+k<-length(unique(Type))  #number of groups 
+C<- choose(k,2)   #compute kC2 
+t <- qt((1-(0.05/(2*C))),(length(Type)-k)) # t-statistic 
+
+print("Beef")
+c(u1-u2-t*se12,u1-u2+t*se12) #CI for can &  oil
+print("Meat")
+c(u1-u3-t*se13,u1-u3+t*se13) # CI  for can  &  fla 
+print("Poultry")
+c(u2-u3-t*se23,u2-u3+t*se23) # CI  for oil  &  fla
+```
+
